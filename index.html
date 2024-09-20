@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/dist/output.css" />
+    <title>Games</title>
+  </head>
+  <body
+    class="flex justify-center items-center h-screen w-screen bg-primary text-white"
+  >
+    <div class="container relative">
+      <div
+        id="result"
+        class="absolute -top-20 left-50 text-xl uppercase tracking-widest"
+      ></div>
+      <div class="sides computer">
+        <h1 class="title">Computer</h1>
+        <div class="btn">
+          <button disabled id="computerStone">Stone</button>
+          <button disabled id="computerPaper">Paper</button>
+          <button disabled id="computerScissor">Scissor</button>
+        </div>
+      </div>
+      <div class="sides player">
+        <h1 class="title">Player</h1>
+        <div class="btn">
+          <button id="playerStone">Stone</button>
+          <button id="playerPaper">Paper</button>
+          <button id="playerScissor">Scissor</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const computerButtons = document.querySelectorAll(
+        ".computer .btn button"
+      );
+      const playerButtons = document.querySelectorAll(".player .btn button");
+      const resultDiv = document.getElementById("result");
+      let currentIndex = 0;
+      let intervalId;
+      let playerChoice;
+
+      // Function to highlight buttons in sequence for the computer
+      function highlightButton() {
+        computerButtons.forEach((button) =>
+          button.classList.remove("highlight")
+        );
+        computerButtons[currentIndex].classList.add("highlight");
+        currentIndex = (currentIndex + 1) % computerButtons.length;
+      }
+
+      // Function to choose a random computer button and determine winner
+      function chooseRandomButton() {
+        const randomIndex = Math.floor(Math.random() * computerButtons.length);
+        computerButtons.forEach((button) =>
+          button.classList.remove("highlight")
+        );
+        computerButtons[randomIndex].classList.add("highlight");
+        clearInterval(intervalId); // Stop the interval once a choice is made
+
+        const computerChoice = computerButtons[randomIndex].id
+          .replace("computer", "")
+          .toLowerCase();
+        determineWinner(playerChoice, computerChoice); // Check who wins
+      }
+
+      // Function to determine the winner
+      function determineWinner(player, computer) {
+        let result = "";
+        if (player === computer) {
+          result = "It's a draw!";
+        } else if (
+          (player === "stone" && computer === "scissor") ||
+          (player === "scissor" && computer === "paper") ||
+          (player === "paper" && computer === "stone")
+        ) {
+          result = "Player wins!";
+        } else {
+          result = "Computer wins!";
+        }
+        resultDiv.textContent = result;
+      }
+
+      // Event listener for player buttons
+      playerButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          playerChoice = button.id.replace("player", "").toLowerCase();
+          resultDiv.textContent = ""; // Clear previous result
+          playerButtons.forEach((btn) => btn.classList.remove("choose"));
+          // Highlight the player's choice
+          button.classList.add("choose");
+          // Start the 200ms interval when a player button is pressed
+          intervalId = setInterval(highlightButton, 200);
+
+          // After 2 seconds, the computer makes a random choice
+          setTimeout(chooseRandomButton, 2000);
+        });
+      });
+    </script>
+  </body>
+</html>
